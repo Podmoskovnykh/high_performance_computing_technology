@@ -7,12 +7,6 @@ Todo List приложение с балансировкой нагрузки.
 ```bash
 # Запустить все сервисы
 docker compose up -d
-
-# Проверить статус
-docker compose ps
-
-# Просмотреть логи
-docker compose logs -f
 ```
 
 ## Доступ к системе
@@ -26,7 +20,13 @@ docker compose logs -f
 ## Проверка ограничений ресурсов
 
 ```bash
-# Проверить ограничения для backend1
-docker inspect load_balancer_backend1 | grep -A 10 "Resources"
+# Проверить ограничения для контейнера (удобный формат)
+./show_resources.sh load_balancer_backend1
+
+# Или для всех контейнеров
+./show_resources.sh
+
+# Альтернативный способ через jq
+docker inspect load_balancer_backend1 | jq '.[0].HostConfig | {Memory, CpuShares, CpuQuota, CpuPeriod, CpusetCpus, CpusetMems, MemoryReservation, MemorySwap, NanoCpus}'
 ```
 
