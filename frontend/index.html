@@ -20,6 +20,17 @@
             padding: 10px;
             margin: 10px 0;
         }
+        .edit-btn {
+            margin-left: 10px;
+            font-size: 0.8em;
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .edit-btn:hover {
+            background: #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -44,8 +55,11 @@
     <h3>API Links</h3>
     <p>
         <a href="/api/info" target="_blank">API Info</a> | 
-        <a href="http://HOSTNAME:5000/api/info" target="_blank">Backend1</a> | 
-        <a href="http://HOSTNAME:5001/api/info" target="_blank">Backend2</a>
+        <a href="/health" target="_blank">Health</a> | 
+        <a href="http://HOSTNAME:5000/api/info" target="_blank">Backend1 Info</a> | 
+        <a href="http://HOSTNAME:5001/api/info" target="_blank">Backend2 Info</a> |
+        <a href="http://HOSTNAME:5000/health" target="_blank">Backend1 Health</a> | 
+        <a href="http://HOSTNAME:5001/health" target="_blank">Backend2 Health</a>
     </p>
 
     <div id="messages" style="position: fixed; top: 10px; right: 10px; background: white; border: 1px solid black; padding: 10px; display: none;"></div>
@@ -74,10 +88,19 @@
                 
                 if (result.todos && result.todos.length > 0) {
                     todoList.innerHTML = result.todos.map(todo => `
-                        <div class="todo-item">
+                        <div class="todo-item" id="todo-${todo.id}">
                             <input type="checkbox" ${todo.completed ? 'checked' : ''} 
                                    onchange="toggleTodo(${todo.id}, this.checked)">
-                            <strong>${escapeHtml(todo.title)}</strong>
+                            <span id="title-display-${todo.id}">
+                                <strong>${escapeHtml(todo.title)}</strong>
+                                <button class="edit-btn" onclick="editTodoTitle(${todo.id})">Редактировать</button>
+                            </span>
+                            <span id="title-edit-${todo.id}" style="display: none;">
+                                <input type="text" id="title-input-${todo.id}" value="${escapeHtml(todo.title)}" size="40"
+                                       onkeypress="if(event.key === 'Enter') saveTodoTitle(${todo.id}); if(event.key === 'Escape') cancelEditTitle(${todo.id});">
+                                <button onclick="saveTodoTitle(${todo.id})">Сохранить</button>
+                                <button onclick="cancelEditTitle(${todo.id})">Отмена</button>
+                            </span>
                             <br>
                             <small>ID: ${todo.id} | Instance: ${todo.instance_id} | ${new Date(todo.created_at).toLocaleString('ru-RU')}</small>
                             <br>
@@ -154,6 +177,47 @@
                     showMessage('Задача удалена');
                     loadTodos();
                 } else {
+                    alert('Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        function editTodoTitle(todoId) {
+            document.getElementById(`title-display-${todoId}`).style.display = 'none';
+            document.getElementById(`title-edit-${todoId}`).style.display = 'inline';
+            const input = document.getElementById(`title-input-${todoId}`);
+            input.focus();
+            input.select();
+        }
+
+        function cancelEditTitle(todoId) {
+            document.getElementById(`title-display-${todoId}`).style.display = 'inline';
+            document.getElementById(`title-edit-${todoId}`).style.display = 'none';
+        }
+
+        async function saveTodoTitle(todoId) {
+            const input = document.getElementById(`title-input-${todoId}`);
+            const newTitle = input.value.trim();
+            
+            if (!newTitle) {
+                alert('Название задачи не может быть пустым');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/todos/${todoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle })
+                });
+                
+                if (response.ok) {
+                    showMessage('Название задачи обновлено');
+                    loadTodos();
+                } else {
+                    const result = await response.json();
                     alert('Ошибка: ' + result.error);
                 }
             } catch (error) {
