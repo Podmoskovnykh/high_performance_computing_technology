@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
   db:
     image: postgres:15-alpine
     container_name: load_balancer_db
@@ -29,7 +28,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API - Instance 1
   backend1:
     build:
       context: ./backend
@@ -58,7 +56,6 @@ services:
           cpus: '0.25'
           memory: 128M
 
-  # Backend API - Instance 2
   backend2:
     build:
       context: ./backend
@@ -87,7 +84,6 @@ services:
           cpus: '0.25'
           memory: 128M
 
-  # Nginx Load Balancer
   nginx:
     image: nginx:alpine
     container_name: load_balancer_nginx
