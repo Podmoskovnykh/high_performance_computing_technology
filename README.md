@@ -20,7 +20,7 @@ docker compose up -d
 ## Проверка ограничений ресурсов
 
 ```bash
-# Проверить ограничения для контейнера (удобный формат)
+# Проверить ограничения для контейнера
 ./show_resources.sh load_balancer_backend1
 
 # Или для всех контейнеров
@@ -29,4 +29,3 @@ docker compose up -d
 # Альтернативный способ через jq
 docker inspect load_balancer_backend1 | jq '.[0].HostConfig | {Memory, CpuShares, CpuQuota, CpuPeriod, CpusetCpus, CpusetMems, MemoryReservation, MemorySwap, NanoCpus}'
 ```
-

@@ -23,3 +23,7 @@ ENV/
 .DS_Store
 Thumbs.db
 
+load_testing/results/**
+!load_testing/results/
+!load_testing/results/with_balancer/
+!load_testing/results/with_balancer/test_*154915*

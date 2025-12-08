@@ -243,6 +243,25 @@ def delete_todo(todo_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/api/todos/all', methods=['DELETE'])
+def delete_all_todos():
+    """Delete all todos"""
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    try:
+        cur = conn.cursor()
+        cur.execute('TRUNCATE TABLE todos RESTART IDENTITY CASCADE;')
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({'message': 'All todos deleted successfully', 'instance_id': INSTANCE_ID}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     print(f"Starting backend instance: {INSTANCE_ID}")
     init_db()

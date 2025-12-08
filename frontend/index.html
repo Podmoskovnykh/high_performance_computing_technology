@@ -44,6 +44,7 @@
     <input type="text" id="titleInput" placeholder="Название задачи" size="50">
     <button onclick="createTodo()">Добавить</button>
     <button onclick="loadTodos()">Обновить</button>
+    <button onclick="deleteAllTodos()">Удалить все</button>
 
     <hr>
 
@@ -178,6 +179,28 @@
                     loadTodos();
                 } else {
                     alert('Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        async function deleteAllTodos() {
+            if (!confirm('Удалить все задачи?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/todos/all`, { method: 'DELETE' });
+                const text = await response.text();
+                let result = {};
+                try {
+                    result = JSON.parse(text);
+                } catch (_) {
+                    result = { error: text || 'Не удалось разобрать ответ' };
+                }
+                if (response.ok) {
+                    showMessage('Все задачи удалены');
+                    loadTodos();
+                } else {
+                    alert('Ошибка: ' + (result.error || 'Неизвестно'));
                 }
             } catch (error) {
                 alert('Ошибка: ' + error.message);

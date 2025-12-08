@@ -1,0 +1,162 @@
+[
+  {
+    "iteration": 0,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 65,
+        "upstream_keepalive": 32
+      }
+    },
+    "metrics": {
+      "rps": 31.926321311313316,
+      "avg_response_time": 19.744413814896834,
+      "total_requests": 1887,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 1,
+    "config": {
+      "nginx": {
+        "worker_connections": 512,
+        "keepalive_timeout": 90,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.72174499679811,
+      "avg_response_time": 20.55556197814374,
+      "total_requests": 1935,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 2,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 90,
+        "upstream_keepalive": 16
+      }
+    },
+    "metrics": {
+      "rps": 32.63031334907742,
+      "avg_response_time": 18.646918092339604,
+      "total_requests": 1927,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 3,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 30,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.5721914941958,
+      "avg_response_time": 19.51592784360915,
+      "total_requests": 1924,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 4,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 30,
+        "upstream_keepalive": 32
+      }
+    },
+    "metrics": {
+      "rps": 32.24624729140537,
+      "avg_response_time": 22.63126611635812,
+      "total_requests": 1906,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 5,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 60,
+        "upstream_keepalive": 32
+      }
+    },
+    "metrics": {
+      "rps": 32.52739158038835,
+      "avg_response_time": 22.123058134009344,
+      "total_requests": 1924,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 6,
+    "config": {
+      "nginx": {
+        "worker_connections": 1536,
+        "keepalive_timeout": 30,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.44576576901582,
+      "avg_response_time": 21.98410854309537,
+      "total_requests": 1917,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 7,
+    "config": {
+      "nginx": {
+        "worker_connections": 1536,
+        "keepalive_timeout": 90,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.56966186255088,
+      "avg_response_time": 20.140550204177764,
+      "total_requests": 1925,
+      "success_rate": 99.94805194805195
+    }
+  },
+  {
+    "iteration": 8,
+    "config": {
+      "nginx": {
+        "worker_connections": 1536,
+        "keepalive_timeout": 60,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.68306842498851,
+      "avg_response_time": 19.67039075402754,
+      "total_requests": 1931,
+      "success_rate": 100.0
+    }
+  },
+  {
+    "iteration": 9,
+    "config": {
+      "nginx": {
+        "worker_connections": 1024,
+        "keepalive_timeout": 60,
+        "upstream_keepalive": 48
+      }
+    },
+    "metrics": {
+      "rps": 32.399844533057575,
+      "avg_response_time": 21.600727404935366,
+      "total_requests": 1916,
+      "success_rate": 100.0
+    }
+  }
+]
