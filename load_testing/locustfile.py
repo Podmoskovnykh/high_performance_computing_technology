@@ -1,35 +1,15 @@
-"""
-Сценарии нагрузочного тестирования для Todo List приложения
-
-Два типа пользователей:
-1. ReaderUser - пользователь, который в основном читает данные
-2. WriterUser - пользователь, который создает, обновляет и удаляет данные
-"""
-
 from locust import HttpUser, task, between
 import random
 
 
 class ReaderUser(HttpUser):
-    """
-    Пользователь-читатель: выполняет операции чтения данных
-    Задачи:
-    1. Проверка здоровья сервиса
-    2. Получение информации об инстансе
-    3. Просмотр списка todos
-    4. Просмотр списка todos с фильтрацией (повторный запрос)
-    5. Получение информации об инстансе (повторно)
-    """
-    
     wait_time = between(1, 3)
     
     def on_start(self):
-        """Инициализация пользователя"""
         self.todo_ids = []
     
     @task(3)
     def check_health(self):
-        """Задача 1: Проверка здоровья сервиса"""
         with self.client.get("/health", catch_response=True, name="Health Check") as response:
             if response.status_code == 200:
                 response.success()
@@ -38,7 +18,6 @@ class ReaderUser(HttpUser):
     
     @task(3)
     def get_instance_info(self):
-        """Задача 2: Получение информации об инстансе"""
         with self.client.get("/api/info", catch_response=True, name="Get Instance Info") as response:
             if response.status_code == 200:
                 data = response.json()
@@ -48,7 +27,6 @@ class ReaderUser(HttpUser):
     
     @task(5)
     def get_all_todos(self):
-        """Задача 3: Просмотр списка todos"""
         with self.client.get("/api/todos", catch_response=True, name="Get All Todos") as response:
             if response.status_code == 200:
                 data = response.json()
@@ -60,7 +38,6 @@ class ReaderUser(HttpUser):
     
     @task(2)
     def get_todos_again(self):
-        """Задача 4: Повторный просмотр списка todos"""
         with self.client.get("/api/todos", catch_response=True, name="Get Todos Again") as response:
             if response.status_code == 200:
                 response.success()
@@ -69,7 +46,6 @@ class ReaderUser(HttpUser):
     
     @task(2)
     def refresh_instance_info(self):
-        """Задача 5: Обновление информации об инстансе"""
         with self.client.get("/api/info", catch_response=True, name="Refresh Instance Info") as response:
             if response.status_code == 200:
                 response.success()
@@ -78,26 +54,14 @@ class ReaderUser(HttpUser):
 
 
 class WriterUser(HttpUser):
-    """
-    Пользователь-писатель: выполняет операции создания, обновления и удаления данных
-    Задачи:
-    1. Создание нового todo
-    2. Просмотр списка todos
-    3. Обновление существующего todo
-    4. Создание еще одного todo
-    5. Удаление todo
-    """
-    
     wait_time = between(2, 5)
     
     def on_start(self):
-        """Инициализация пользователя"""
         self.created_todo_ids = []
         self.all_todo_ids = []
     
     @task(4)
     def create_todo(self):
-        """Задача 1: Создание нового todo"""
         todo_titles = [
             "Купить продукты",
             "Изучить Python",
@@ -143,7 +107,6 @@ class WriterUser(HttpUser):
     
     @task(3)
     def get_all_todos(self):
-        """Задача 2: Просмотр списка todos"""
         with self.client.get("/api/todos", catch_response=True, name="Get All Todos") as response:
             if response.status_code == 200:
                 data = response.json()
@@ -155,7 +118,6 @@ class WriterUser(HttpUser):
     
     @task(3)
     def update_todo(self):
-        """Задача 3: Обновление существующего todo"""
         if not self.all_todo_ids:
             with self.client.get("/api/todos", catch_response=True) as response:
                 if response.status_code == 200:
@@ -187,7 +149,6 @@ class WriterUser(HttpUser):
     
     @task(2)
     def create_another_todo(self):
-        """Задача 4: Создание еще одного todo"""
         todo_titles = [
             "Завершить проект",
             "Отправить письмо",
@@ -217,7 +178,6 @@ class WriterUser(HttpUser):
     
     @task(2)
     def delete_todo(self):
-        """Задача 5: Удаление todo"""
         if not self.all_todo_ids:
             with self.client.get("/api/todos", catch_response=True) as response:
                 if response.status_code == 200:

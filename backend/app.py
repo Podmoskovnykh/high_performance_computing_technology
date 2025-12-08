@@ -18,7 +18,6 @@ INSTANCE_ID = os.getenv('INSTANCE_ID', 'unknown')
 PORT = os.getenv('PORT', '5000')
 
 def format_datetime(dt):
-    """Convert datetime to UTC ISO format string"""
     if dt is None:
         return None
     if dt.tzinfo is None:
@@ -26,7 +25,6 @@ def format_datetime(dt):
     return dt.astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 def get_db_connection():
-    """Create and return database connection"""
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         return conn
@@ -35,7 +33,6 @@ def get_db_connection():
         return None
 
 def init_db():
-    """Initialize database tables"""
     conn = get_db_connection()
     if conn:
         try:
@@ -60,7 +57,6 @@ def init_db():
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
     return jsonify({
         'status': 'healthy',
         'instance_id': INSTANCE_ID,
@@ -70,7 +66,6 @@ def health():
 
 @app.route('/api/info', methods=['GET'])
 def info():
-    """Get instance information"""
     return jsonify({
         'instance_id': INSTANCE_ID,
         'port': PORT,
@@ -80,7 +75,6 @@ def info():
 
 @app.route('/api/todos', methods=['GET'])
 def get_todos():
-    """Get all todos"""
     conn = get_db_connection()
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -116,7 +110,6 @@ def get_todos():
 
 @app.route('/api/todos', methods=['POST'])
 def create_todo():
-    """Create new todo"""
     data = request.get_json()
     title = data.get('title', '').strip() if data else ''
     description = data.get('description', '').strip() if data else ''
@@ -155,7 +148,6 @@ def create_todo():
 
 @app.route('/api/todos/<int:todo_id>', methods=['PUT'])
 def update_todo(todo_id):
-    """Update todo"""
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided'}), 400
@@ -220,7 +212,6 @@ def update_todo(todo_id):
 
 @app.route('/api/todos/<int:todo_id>', methods=['DELETE'])
 def delete_todo(todo_id):
-    """Delete todo"""
     conn = get_db_connection()
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
@@ -246,7 +237,6 @@ def delete_todo(todo_id):
 
 @app.route('/api/todos/all', methods=['DELETE'])
 def delete_all_todos():
-    """Delete all todos"""
     conn = get_db_connection()
     if not conn:
         return jsonify({'error': 'Database connection failed'}), 500
