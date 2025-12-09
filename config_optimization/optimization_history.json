@@ -9,154 +9,132 @@
       }
     },
     "metrics": {
-      "rps": 31.926321311313316,
-      "avg_response_time": 19.744413814896834,
-      "total_requests": 1887,
-      "success_rate": 100.0
+      "rps": 18.73273889027779,
+      "rps_median": 18.73379666760308,
+      "rps_mad": 0.13555981002345874,
+      "rps_mad_n": 0.2009809743407799,
+      "rps_rel_mad_pct": 1.0728862208456242,
+      "rps_min": 18.52388721298417,
+      "rps_max": 18.880718302821577,
+      "rps_q1": 18.65593579035359,
+      "rps_q3": 18.86935647762654,
+      "avg_response_time": 20.305621219302143,
+      "avg_response_time_mad_n": 1.4112655339051716,
+      "success_rate": 100.0,
+      "success_rate_mad_n": 0.0,
+      "total_runs": 5,
+      "valid_runs": 5,
+      "raw_rps_values": [
+        18.52388721298417,
+        18.880718302821577,
+        18.86935647762654,
+        18.65593579035359,
+        18.73379666760308
+      ]
     }
   },
   {
     "iteration": 1,
     "config": {
       "nginx": {
-        "worker_connections": 512,
-        "keepalive_timeout": 90,
-        "upstream_keepalive": 48
+        "worker_connections": 1536,
+        "keepalive_timeout": 60,
+        "upstream_keepalive": 16
       }
     },
     "metrics": {
-      "rps": 32.72174499679811,
-      "avg_response_time": 20.55556197814374,
-      "total_requests": 1935,
-      "success_rate": 100.0
+      "rps": 18.66712168465347,
+      "rps_median": 18.67177974206253,
+      "rps_mad": 0.25097326430593014,
+      "rps_mad_n": 0.372092961659972,
+      "rps_rel_mad_pct": 1.9933065629816695,
+      "rps_min": 18.35897922502305,
+      "rps_max": 18.93153816889511,
+      "rps_q1": 18.4505582809182,
+      "rps_q3": 18.92275300636846,
+      "avg_response_time": 20.39420795234316,
+      "avg_response_time_mad_n": 1.249607362065078,
+      "success_rate": 100.0,
+      "success_rate_mad_n": 0.0,
+      "total_runs": 5,
+      "valid_runs": 5,
+      "raw_rps_values": [
+        18.93153816889511,
+        18.4505582809182,
+        18.92275300636846,
+        18.35897922502305,
+        18.67177974206253
+      ]
     }
   },
   {
     "iteration": 2,
     "config": {
       "nginx": {
-        "worker_connections": 1024,
-        "keepalive_timeout": 90,
-        "upstream_keepalive": 16
+        "worker_connections": 1536,
+        "keepalive_timeout": 60,
+        "upstream_keepalive": 48
       }
     },
     "metrics": {
-      "rps": 32.63031334907742,
-      "avg_response_time": 18.646918092339604,
-      "total_requests": 1927,
-      "success_rate": 100.0
+      "rps": 18.927646059258446,
+      "rps_median": 18.97496807708309,
+      "rps_mad": 0.16571313392828202,
+      "rps_mad_n": 0.2456862923620709,
+      "rps_rel_mad_pct": 1.2980287754371527,
+      "rps_min": 18.602944842548858,
+      "rps_max": 19.230442257817124,
+      "rps_q1": 18.80925494315481,
+      "rps_q3": 19.02062017568835,
+      "avg_response_time": 23.811915919185697,
+      "avg_response_time_mad_n": 1.7744501708611213,
+      "success_rate": 100.0,
+      "success_rate_mad_n": 0.0,
+      "total_runs": 5,
+      "valid_runs": 5,
+      "raw_rps_values": [
+        19.02062017568835,
+        19.230442257817124,
+        18.602944842548858,
+        18.97496807708309,
+        18.80925494315481
+      ]
     }
   },
   {
     "iteration": 3,
     "config": {
       "nginx": {
-        "worker_connections": 1024,
+        "worker_connections": 512,
         "keepalive_timeout": 30,
-        "upstream_keepalive": 48
+        "upstream_keepalive": 16
       }
     },
     "metrics": {
-      "rps": 32.5721914941958,
-      "avg_response_time": 19.51592784360915,
-      "total_requests": 1924,
-      "success_rate": 100.0
-    }
-  },
-  {
-    "iteration": 4,
-    "config": {
-      "nginx": {
-        "worker_connections": 1024,
-        "keepalive_timeout": 30,
-        "upstream_keepalive": 32
-      }
-    },
-    "metrics": {
-      "rps": 32.24624729140537,
-      "avg_response_time": 22.63126611635812,
-      "total_requests": 1906,
-      "success_rate": 100.0
-    }
-  },
-  {
-    "iteration": 5,
-    "config": {
-      "nginx": {
-        "worker_connections": 1024,
-        "keepalive_timeout": 60,
-        "upstream_keepalive": 32
-      }
-    },
-    "metrics": {
-      "rps": 32.52739158038835,
-      "avg_response_time": 22.123058134009344,
-      "total_requests": 1924,
-      "success_rate": 100.0
-    }
-  },
-  {
-    "iteration": 6,
-    "config": {
-      "nginx": {
-        "worker_connections": 1536,
-        "keepalive_timeout": 30,
-        "upstream_keepalive": 48
-      }
-    },
-    "metrics": {
-      "rps": 32.44576576901582,
-      "avg_response_time": 21.98410854309537,
-      "total_requests": 1917,
-      "success_rate": 100.0
-    }
-  },
-  {
-    "iteration": 7,
-    "config": {
-      "nginx": {
-        "worker_connections": 1536,
-        "keepalive_timeout": 90,
-        "upstream_keepalive": 48
-      }
-    },
-    "metrics": {
-      "rps": 32.56966186255088,
-      "avg_response_time": 20.140550204177764,
-      "total_requests": 1925,
-      "success_rate": 99.94805194805195
-    }
-  },
-  {
-    "iteration": 8,
-    "config": {
-      "nginx": {
-        "worker_connections": 1536,
-        "keepalive_timeout": 60,
-        "upstream_keepalive": 48
-      }
-    },
-    "metrics": {
-      "rps": 32.68306842498851,
-      "avg_response_time": 19.67039075402754,
-      "total_requests": 1931,
-      "success_rate": 100.0
-    }
-  },
-  {
-    "iteration": 9,
-    "config": {
-      "nginx": {
-        "worker_connections": 1024,
-        "keepalive_timeout": 60,
-        "upstream_keepalive": 48
-      }
-    },
-    "metrics": {
-      "rps": 32.399844533057575,
-      "avg_response_time": 21.600727404935366,
-      "total_requests": 1916,
-      "success_rate": 100.0
+      "rps": 18.98965476323006,
+      "rps_median": 18.970809545149006,
+      "rps_mad": 0.07610565956663606,
+      "rps_mad_n": 0.11283425087349462,
+      "rps_rel_mad_pct": 0.5941880054184935,
+      "rps_min": 18.820147786836134,
+      "rps_max": 19.28335597408823,
+      "rps_q1": 18.89470388558237,
+      "rps_q3": 18.97925662449456,
+      "avg_response_time": 19.803403084618935,
+      "avg_response_time_mad_n": 0.6719729588561532,
+      "success_rate": 99.94428969359332,
+      "success_rate_mad_n": 0.0,
+      "total_runs": 5,
+      "valid_runs": 5,
+      "raw_rps_values": [
+        18.970809545149006,
+        18.820147786836134,
+        18.97925662449456,
+        19.28335597408823,
+        18.89470388558237
+      ],
+      "_significance_status": "—",
+      "_significance_color": "gray"
     }
   }
 ]

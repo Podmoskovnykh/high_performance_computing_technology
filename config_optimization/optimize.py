@@ -7,9 +7,12 @@ import time
 import csv
 import re
 import base64
+import statistics
 from pathlib import Path
 from typing import Dict, Any, List, Tuple
 from datetime import datetime
+from typing import Optional
+
 
 try:
     import matplotlib
@@ -185,6 +188,7 @@ def run_load_test(users: int, spawn_rate: int, duration: int, base_dir: Path) ->
         )
         
         results_dir = load_testing_dir / "results" / "with_balancer"
+
         if not results_dir.exists():
             return {'rps': 0.0, 'error': 'Директория результатов не найдена'}
         
@@ -203,6 +207,77 @@ def run_load_test(users: int, spawn_rate: int, duration: int, base_dir: Path) ->
         return {'rps': 0.0, 'error': 'Тест превысил максимальное время'}
     except Exception as e:
         return {'rps': 0.0, 'error': f'Ошибка: {e}'}
+
+
+def run_load_test_repeated(users: int, spawn_rate: int, duration: int, base_dir: Path, repeats: int = 1) -> Dict[str, Any]:
+    repeats = 5
+
+    runs: List[Dict[str, Any]] = []
+    for i in range(1, repeats + 1):
+        print(f"  → Повтор {i}/{repeats}...", end=" ", flush=True)
+        result = run_load_test(users, spawn_rate, duration, base_dir)
+        if 'error' in result:
+            print(f"ОШИБКА: {result['error']}")
+        else:
+            rps = result.get('rps', 0)
+            print(f"RPS: {rps:.2f}")
+        runs.append(result)
+
+    valid_rps = [r['rps'] for r in runs if r.get('rps', 0) > 0]
+    valid_avg_rt = [r['avg_response_time'] for r in runs if r.get('avg_response_time', 0) > 0]
+    valid_success = [r['success_rate'] for r in runs if r.get('success_rate', 0) >= 0]
+
+    if not valid_rps:
+        return {'rps': 0.0, 'error': 'Ни один прогон не вернул валидный RPS'}
+
+    median_rps = statistics.median(valid_rps)
+    mean_rps = statistics.mean(valid_rps)
+
+    mad_rps = statistics.median([abs(x - median_rps) for x in valid_rps])
+    mad_n_rps = 1.4826 * mad_rps
+
+    rel_mad_pct = (mad_n_rps / mean_rps * 100) if mean_rps > 0 else 0.0
+
+    min_rps, max_rps = min(valid_rps), max(valid_rps)
+    q1, q3 = None, None
+    if len(valid_rps) >= 2:
+        sorted_rps = sorted(valid_rps)
+        n = len(sorted_rps)
+        q1 = sorted_rps[n // 4]
+        q3 = sorted_rps[3 * n // 4]
+
+    median_rt = statistics.median(valid_avg_rt) if valid_avg_rt else 0.0
+    mad_rt = statistics.median([abs(x - median_rt) for x in valid_avg_rt]) if len(valid_avg_rt) > 1 else 0.0
+    mad_n_rt = 1.4826 * mad_rt
+
+    median_success = statistics.median(valid_success) if valid_success else 0.0
+    mad_success = statistics.median([abs(x - median_success) for x in valid_success]) if len(valid_success) > 1 else 0.0
+    mad_n_success = 1.4826 * mad_success
+
+    aggregated = {
+        'rps': mean_rps,         
+        'rps_median': median_rps,
+        'rps_mad': mad_rps,
+        'rps_mad_n': mad_n_rps,   
+        'rps_rel_mad_pct': rel_mad_pct,
+
+        'rps_min': min_rps,
+        'rps_max': max_rps,
+        'rps_q1': q1,
+        'rps_q3': q3,
+
+        'avg_response_time': statistics.mean(valid_avg_rt) if valid_avg_rt else 0.0,
+        'avg_response_time_mad_n': mad_n_rt,
+
+        'success_rate': statistics.mean(valid_success) if valid_success else 0.0,
+        'success_rate_mad_n': mad_n_success,
+
+        'total_runs': repeats,
+        'valid_runs': len(valid_rps),
+        'raw_rps_values': valid_rps,  
+    }
+
+    return aggregated
 
 
 def parse_locust_results(stats_file: Path) -> Dict[str, Any]:
@@ -283,6 +358,14 @@ def generate_report(history: List[Dict[str, Any]], base_dir: Path, output_file: 
     
     initial_metrics = history[0]['metrics'] if history else {}
     initial_rps = initial_metrics.get('rps', 0)
+    
+    best_rps = best_metrics.get('rps', 0)
+    best_rps_std = best_metrics.get('rps_std', 0)
+    best_rps_rel_err = best_metrics.get('rps_rel_err_pct', 0)
+
+    initial_rps = initial_metrics.get('rps', 0)
+    initial_rps_std = initial_metrics.get('rps_std', 0)
+    initial_rps_rel_err = initial_metrics.get('rps_rel_err_pct', 0)
     
     improvement = 0
     if initial_rps > 0:
@@ -368,9 +451,9 @@ def generate_report(history: List[Dict[str, Any]], base_dir: Path, output_file: 
         <div class="summary">
             <h2>Сводка</h2>
             <div class="metrics">
-                <div class="metric"><div class="metric-title">Начальный RPS</div><div class="metric-value">{initial_rps:.2f}</div></div>
-                <div class="metric"><div class="metric-title">Лучший RPS</div><div class="metric-value">{best_rps:.2f}</div></div>
-                <div class="metric"><div class="metric-title">Прирост</div><div class="metric-value">{improvement:+.2f}%</div></div>
+                <div class="metric"><div class="metric-title">Начальный RPS</div><div class="metric-value">{initial_rps:.2f} ± {initial_rps_std:.2f}</div></div>
+                <div class="metric"><div class="metric-title">Лучший RPS</div><div class="metric-value">{best_rps:.2f} ± {best_rps_std:.2f}</div></div>
+                <div class="metric"><div class="metric-title">Относ. погрешность (лучшая)</div><div class="metric-value">{best_rps_rel_err:.1f}%</div></div>
                 <div class="metric"><div class="metric-title">Итераций</div><div class="metric-value">{len(history)}</div></div>
             </div>
         </div>
@@ -409,7 +492,7 @@ def generate_report(history: List[Dict[str, Any]], base_dir: Path, output_file: 
                 <th>worker_connections</th>
                 <th>keepalive_timeout</th>
                 <th>upstream_keepalive</th>
-                <th>RPS</th>
+                <th>RPS (±σ, %ош)</th>
                 <th>Время отклика (мс)</th>
                 <th>Успешность (%)</th>
             </tr>"""
@@ -425,7 +508,7 @@ def generate_report(history: List[Dict[str, Any]], base_dir: Path, output_file: 
                 <td>{nginx.get('worker_connections', 0)}</td>
                 <td>{nginx.get('keepalive_timeout', 0)}</td>
                 <td>{nginx.get('upstream_keepalive', 0)}</td>
-                <td>{metrics.get('rps', 0):.2f}</td>
+                <td>{metrics.get('rps', 0):.2f} ± {metrics.get('rps_std', 0):.2f} ({metrics.get('rps_rel_err_pct', 0):.1f}%)</td>
                 <td>{metrics.get('avg_response_time', 0):.2f}</td>
                 <td>{metrics.get('success_rate', 0):.2f}</td>
             </tr>"""
@@ -456,6 +539,7 @@ def main():
     parser.add_argument('--test-duration', type=int, default=60, help='Длительность теста в секундах')
     parser.add_argument('--full-reset', action='store_true', help='Полный сброс (удаление volumes) перед началом')
     parser.add_argument('--output', type=str, default=None, help='Путь для сохранения отчета')
+    parser.add_argument('--repeats', type=int, default=5, help='Количество повторов теста для каждой конфигурации')
     
     args = parser.parse_args()
     
@@ -466,7 +550,7 @@ def main():
     print("АВТОМАТИЗИРОВАННЫЙ ПОИСК ЭФФЕКТИВНЫХ КОНФИГУРАЦИЙ")
     print("=" * 70)
     print(f"Итераций: {args.iterations}")
-    print(f"Параметры теста: {args.test_users} пользователей, {args.test_duration} сек")
+    print(f"Параметры теста: {args.test_users} пользователей, {args.test_duration} сек, {args.repeats} повторов")
     print()
     
     configs = generate_grid_configs(grid_size=args.grid_size)
@@ -494,7 +578,9 @@ def main():
         print("ШАГ 2: Базовый нагрузочный тест (начальная конфигурация)")
         print("=" * 70)
         
-        initial_metrics = run_load_test(args.test_users, args.test_spawn_rate, args.test_duration, base_dir)
+        initial_metrics = run_load_test_repeated(
+            args.test_users, args.test_spawn_rate, args.test_duration, base_dir, repeats=args.repeats
+        )
         history.append({'iteration': 0, 'config': initial_config, 'metrics': initial_metrics})
         initial_rps = initial_metrics.get('rps', 0)
         print(f"\nБазовый RPS: {initial_rps:.2f}")
@@ -524,7 +610,9 @@ def main():
                 continue
             restart_nginx(base_dir)
             
-            metrics = run_load_test(args.test_users, args.test_spawn_rate, args.test_duration, base_dir)
+            metrics = run_load_test_repeated(
+                args.test_users, args.test_spawn_rate, args.test_duration, base_dir, repeats=args.repeats
+            )
             rps = metrics.get('rps', 0)
             
             history.append({'iteration': iteration, 'config': config, 'metrics': metrics})
@@ -548,6 +636,48 @@ def main():
         if initial_rps > 0:
             improvement = ((best_rps - initial_rps) / initial_rps) * 100
         print(f"\nПрирост эффективности: {improvement:+.2f}%")
+        
+        try:
+            best_iter = max(history, key=lambda x: x['metrics'].get('rps', 0))
+            best_metrics = best_iter['metrics']
+            
+            initial_metrics = history[0]['metrics']
+
+            initial_rps_val = initial_metrics.get('rps', 0.0)
+            best_rps_val = best_metrics.get('rps', 0.0)
+            
+            initial_mad_n = initial_metrics.get('rps_mad_n', 0.0)
+            best_mad_n = best_metrics.get('rps_mad_n', 0.0)
+            
+            gain = best_rps_val - initial_rps_val
+            total_uncertainty = initial_mad_n + best_mad_n
+            
+            print(f"\n" + "=" * 70)
+            print("АНАЛИЗ СТАТИСТИЧЕСКОЙ ЗНАЧИМОСТИ")
+            print("=" * 70)
+            print(f"  Базовый:       {initial_rps_val:.1f} ± {initial_mad_n:.1f}")
+            print(f"  Лучший:        {best_rps_val:.1f} ± {best_mad_n:.1f}")
+            print(f"  Прирост:       {gain:+.1f}")
+            print(f"  Совокупная погрешность: {total_uncertainty:.1f}")
+            
+            if gain > total_uncertainty:
+                status = "Прирост значим"
+            elif gain > 0.5 * total_uncertainty and gain > 0:
+                status = "Прирост вероятен, требует проверки"
+            elif gain <= 0:
+                status = "Ухудшение или нет прироста"
+            else:
+                status = "Прирост в пределах погрешности"
+                
+            print(f"  {status}")
+            
+            best_metrics['_significance_status'] = status
+
+        except Exception as e:
+            print(f"\nНе удалось провести анализ значимости: {e}")
+            status = "—"
+            if history:
+                history[-1]['metrics']['_significance_status'] = status
         
         print("\n" + "=" * 70)
         print("ШАГ 4: Генерация отчета")
